@@ -5,7 +5,7 @@ import range from 'lodash/range';
 import React, { useCallback, useContext } from 'react';
 import { FormGroup, Input, Table } from 'reactstrap';
 import { HabitContext } from '../../contexts';
-import { firestore } from '../../firebase/clientApp';
+import firestore from '../../firebase/clientApp';
 
 export default function WeeklyTable() {
   const {

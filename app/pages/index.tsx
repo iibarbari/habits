@@ -1,9 +1,7 @@
 import classNames from 'classnames';
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import {
-  Button, Col, Container, Row,
-} from 'reactstrap';
+import { Container } from 'reactstrap';
 import { WeeklyTable, Welcoming } from '../components';
 
 const Home: NextPage = () => (
