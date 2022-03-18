@@ -3,21 +3,21 @@ import React from 'react';
 
 type Props = Overwrite<React.PropsWithoutRef<JSX.IntrinsicElements['svg']>, {
   icon: React.PropsWithoutRef<JSX.IntrinsicElements['svg']>
-  width?: number | 'auto'
-  height?: number | 'auto'
+  width?: number
+  height?: number
 }>
 
 export default function Icon({
   className,
-  height = 'auto',
+  height = 16,
   icon,
   viewBox,
   width = 16,
   ...props
 }: Props) {
   const iconProps = {
-    width: typeof width === 'number' ? `${width}px` : 'auto',
-    height: typeof height === 'number' ? `${height}px` : 'auto',
+    width: `${width}px`,
+    height: `${height}px`,
     className: classNames(className),
     ...props,
   };

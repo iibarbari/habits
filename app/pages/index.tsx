@@ -2,14 +2,15 @@ import classNames from 'classnames';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { Container } from 'reactstrap';
-import { WeeklyTable, Header } from '../components';
+import { Header, WeeklyTable } from '../components';
 
 const Home: NextPage = () => (
   <div>
     <Head>
       <title>Habits</title>
       <meta content="Habit Tracker" name="description" />
-      <link href="/favicon.ico" rel="icon" />
+      <link href="/assets/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+      <link href="/assets/favicon.ico" rel="icon" type="image/x-icon" />
     </Head>
 
     <Header />

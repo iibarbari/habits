@@ -104,7 +104,7 @@ export default function AddNewHabit() {
       </Modal>
 
       <Button color="primary" onClick={() => setIsOpen(true)} outline size="sm">
-        <Icon icon={<Plus />} width={24} />
+        <Icon height={24} icon={<Plus />} width={24} />
       </Button>
     </>
   );
