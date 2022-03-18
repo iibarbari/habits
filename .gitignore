@@ -39,3 +39,4 @@ app/.vercel
 app/*.tsbuildinfo
 
 extension/next
+extension/assets
