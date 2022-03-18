@@ -39,4 +39,4 @@ jobs:
         run: yarn install --prefer-offline --ignore-engines
 
       - name: Build extension
-        run: yarn build
+        run: cd app && yarn build

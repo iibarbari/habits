@@ -39,7 +39,7 @@ jobs:
         run: yarn install --prefer-offline --ignore-engines
 
       - name: Run stylelint
-        run: yarn lint:style
+        run: cd app && yarn lint:style
 
       - name: Run eslint
-        run: yarn lint
+        run: cd app && yarn lint
