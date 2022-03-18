@@ -38,3 +38,4 @@ app/.vercel
 # typescript
 app/*.tsbuildinfo
 
+extension/next
