@@ -12,6 +12,9 @@ jobs:
   lint:
     name: Run development checks
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./app
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -20,9 +23,6 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: '16'
-
-      - name: Go to app folder
-        run: cd app
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
@@ -39,4 +39,4 @@ jobs:
         run: yarn install --prefer-offline --ignore-engines
 
       - name: Build extension
-        run: cd app && yarn build
+        run: yarn build
