@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { Container } from 'reactstrap';
-import { WeeklyTable, Welcoming } from '../components';
+import { WeeklyTable, Header } from '../components';
 
 const Home: NextPage = () => (
   <div>
@@ -12,7 +12,7 @@ const Home: NextPage = () => (
       <link href="/favicon.ico" rel="icon" />
     </Head>
 
-    <Welcoming />
+    <Header />
 
     <hr />
 
