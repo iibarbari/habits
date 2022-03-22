@@ -11,7 +11,6 @@ export default function Icon({
   className,
   height = 16,
   icon,
-  viewBox,
   width = 16,
   ...props
 }: Props) {

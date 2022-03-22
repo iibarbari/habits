@@ -1348,7 +1348,7 @@
     node-fetch "2.6.7"
     tslib "^2.1.0"
 
-"@firebase/util@1.5.0":
+"@firebase/util@1.5.0", "@firebase/util@^1.5.0":
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/@firebase/util/-/util-1.5.0.tgz#0b6f5eaef49e57896fe152973bbc64f8af172123"
   integrity sha512-4w4OY3YJVHV/4UBZ8OcXb8BD8I83P5n2y+FW0dHhn9OLXdYDg8bvCTA08P0nszpZqBhwutKQ4OS7c530SGjeLg==
