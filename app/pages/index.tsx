@@ -1,11 +1,27 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import { useContext } from 'react';
-import { HabitsPage, LoginPage, SignUpPage } from '../components';
+import React, { useContext, useMemo } from 'react';
+import {
+  HabitsPage, LandingPage, LoginPage, SignUpPage,
+} from '../components';
 import { RouterContext } from '../contexts';
 
 const Home: NextPage = () => {
   const { page } = useContext(RouterContext);
+
+  const currentPage = useMemo<React.ReactNode>(() => {
+    if (page === 'habits') {
+      return <HabitsPage />;
+    } if (page === 'login') {
+      return <LoginPage />;
+    } if (page === 'sign-up') {
+      return <SignUpPage />;
+    } if (page === 'landing') {
+      return <LandingPage />;
+    }
+
+    return <p>Not found</p>;
+  }, [page]);
 
   return (
     <div>
@@ -21,11 +37,7 @@ const Home: NextPage = () => {
         <meta content="#ffffff" name="theme-color" />
       </Head>
 
-      {page === 'sign-up' && <SignUpPage />}
-
-      {page === 'login' && <LoginPage />}
-
-      {page === 'habits' && <HabitsPage />}
+      {currentPage}
     </div>
   );
 };

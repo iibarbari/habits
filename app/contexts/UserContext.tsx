@@ -4,34 +4,21 @@ import {
   getAuth,
   onAuthStateChanged,
   signInWithEmailAndPassword,
+  updateProfile,
 } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import React, {
-  createContext, useCallback, useEffect, useMemo, useState,
+  createContext, useCallback, useContext, useEffect, useMemo, useState,
 } from 'react';
 import firestore from '../firebase/clientApp';
-
-type TSignUp = {
-  email: string;
-  password: string;
-};
-
-type TLogin = {
-  email: string;
-  password: string;
-};
-
-type TUser = {
-  uid: string,
-  email: string | null
-}
+import { RouterContext } from './RouterContext';
 
 type TUserContext = {
   user: TUser | null,
   isLoading: boolean,
-  signUp: (_: TSignUp) => Promise<TUser | string>,
+  signUp: (_: Omit<TSignUp, 'confirmPassword'>) => Promise<null | string>,
   signOut: () => Promise<string | null>,
-  login: (_: TLogin) => Promise<TUser | string>
+  login: (_: TLogin) => Promise<null | string>
 }
 
 const initialValues: TUserContext = {
@@ -45,10 +32,42 @@ const initialValues: TUserContext = {
 export const UserContext = createContext<TUserContext>(initialValues);
 
 export default function UserProvider({ children }: { children: React.ReactNode }) {
+  const { setPage } = useContext(RouterContext);
   const [user, setUser] = useState<TUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const signUp = useCallback(async ({ email, password }: TSignUp) => {
+  const updateUser = useCallback(async (name: TSignUp['name']) => {
+    const auth = getAuth();
+
+    if (auth.currentUser === null) return 'Not authenticated';
+
+    try {
+      setIsLoading(true);
+
+      await updateProfile(auth.currentUser, {
+        displayName: name,
+      });
+
+      if (user !== null) {
+        setUser({
+          ...user,
+          name,
+        });
+      }
+
+      return null;
+    } catch (error: unknown) {
+      if (error instanceof FirebaseError) {
+        return error.message;
+      }
+
+      return 'Something went wrong';
+    } finally {
+      setIsLoading(false);
+    }
+  }, [user]);
+
+  const signUp = useCallback(async ({ name, email, password }: Omit<TSignUp, 'confirmPassword'>) => {
     const auth = getAuth();
 
     try {
@@ -61,41 +80,22 @@ export default function UserProvider({ children }: { children: React.ReactNode }
       );
 
       setUser({
+        name,
         uid: response.user.uid,
-        email: response.user.email,
+        email: response.user.email as string,
       });
 
       const docRef = doc(firestore, `users/${response.user.uid}`);
 
       await setDoc(docRef, {
-        email: response.user.email,
         habits: [],
       });
 
-      return {
-        uid: response.user.uid,
-        email: response.user.email,
-      };
-    } catch (error: unknown) {
-      if (error instanceof FirebaseError) {
-        return error.message;
+      const updateUserResponse = updateUser(name);
+
+      if (updateUserResponse !== null) {
+        return updateUserResponse;
       }
-
-      return 'Something went wrong';
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const signOut = useCallback(async () => {
-    const auth = getAuth();
-
-    try {
-      setIsLoading(true);
-
-      await auth.signOut();
-
-      setUser(null);
 
       return null;
     } catch (error: unknown) {
@@ -107,7 +107,31 @@ export default function UserProvider({ children }: { children: React.ReactNode }
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [updateUser]);
+
+  const signOut = useCallback(async () => {
+    const auth = getAuth();
+
+    try {
+      setIsLoading(true);
+
+      await auth.signOut();
+
+      setUser(null);
+
+      setPage('login');
+
+      return null;
+    } catch (error: unknown) {
+      if (error instanceof FirebaseError) {
+        return error.message;
+      }
+
+      return 'Something went wrong';
+    } finally {
+      setIsLoading(false);
+    }
+  }, [setPage]);
 
   const login = useCallback(async ({ email, password }: TLogin) => {
     const auth = getAuth();
@@ -122,14 +146,12 @@ export default function UserProvider({ children }: { children: React.ReactNode }
       );
 
       setUser({
+        name: response.user.displayName as string,
         uid: response.user.uid,
-        email: response.user.email,
+        email: response.user.email as string,
       });
 
-      return {
-        uid: response.user.uid,
-        email: response.user.email,
-      };
+      return null;
     } catch (error: unknown) {
       if (error instanceof FirebaseError) {
         return error.message;
@@ -146,10 +168,12 @@ export default function UserProvider({ children }: { children: React.ReactNode }
 
     onAuthStateChanged(auth, (u) => {
       setIsLoading(true);
+
       if (u) {
         setUser({
+          name: u.displayName as string,
           uid: u.uid,
-          email: u.email,
+          email: u.email as string,
         });
       } else {
         setUser(null);
@@ -158,6 +182,14 @@ export default function UserProvider({ children }: { children: React.ReactNode }
       setIsLoading(false);
     });
   }, []);
+
+  useEffect(() => {
+    if (user !== null) {
+      setPage('habits');
+    } else {
+      setPage('landing');
+    }
+  }, [setPage, user]);
 
   const value = useMemo(() => ({
     isLoading,

@@ -5,6 +5,9 @@ import {
   Button, Col, Container, Form, FormGroup, Input, Label, Row,
 } from 'reactstrap';
 import { RouterContext, UserContext } from '../../contexts';
+import { ArrowLeft } from '../../icons';
+import Icon from '../Icon';
+import Layout from '../Layout';
 
 type TLogin = {
   email: string,
@@ -53,50 +56,58 @@ export default function LoginPage() {
         <meta content="#ffffff" name="theme-color" />
       </Head>
 
-      <Container className={classNames('mt-5', 'mb-5')}>
-        <Row>
-          <Col lg={{ offset: 3, size: 6 }} sm={{ offset: 2, size: 8 }}>
-            <Form className={classNames('w-100')} onSubmit={handleSubmit}>
-              <fieldset>
-                <h1 className={classNames('mb-5')}>Login</h1>
+      <Layout verticallyCenter>
+        <Container className={classNames('mt-5', 'mb-5')}>
+          <Row>
+            <Col lg={{ offset: 3, size: 6 }} sm={{ offset: 2, size: 8 }}>
+              <Form className={classNames('w-100')} onSubmit={handleSubmit}>
+                <fieldset>
+                  <div className={classNames('d-flex', 'flex-row', 'align-items-center', 'gap-5', 'mb-5')}>
+                    <Button className={classNames('p-0')} onClick={() => setPage('landing')}>
+                      <Icon height={32} icon={<ArrowLeft />} width={32} />
+                    </Button>
 
-                <FormGroup>
-                  <Label for="email">Email</Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    onChange={handleChange}
-                    placeholder="Email"
-                    required
-                    type="email"
-                    value={formData.email}
-                  />
-                </FormGroup>
+                    <h1 className={classNames('m-0')}>Login</h1>
+                  </div>
 
-                <FormGroup>
-                  <Label for="password">Password</Label>
-                  <Input
-                    id="password"
-                    minLength={6}
-                    name="password"
-                    onChange={handleChange}
-                    placeholder="Password"
-                    required
-                    type="password"
-                    value={formData.password}
-                  />
-                </FormGroup>
+                  <FormGroup>
+                    <Label for="email">Email</Label>
+                    <Input
+                      id="email"
+                      name="email"
+                      onChange={handleChange}
+                      placeholder="Email"
+                      required
+                      type="email"
+                      value={formData.email}
+                    />
+                  </FormGroup>
 
-                {error && <p className={classNames('text-danger')}>{error}</p>}
+                  <FormGroup>
+                    <Label for="password">Password</Label>
+                    <Input
+                      id="password"
+                      minLength={6}
+                      name="password"
+                      onChange={handleChange}
+                      placeholder="Password"
+                      required
+                      type="password"
+                      value={formData.password}
+                    />
+                  </FormGroup>
 
-                <Button className={classNames('mt-3')} color="primary" type="submit">
-                  Login
-                </Button>
-              </fieldset>
-            </Form>
-          </Col>
-        </Row>
-      </Container>
+                  {error && <p className={classNames('text-danger')}>{error}</p>}
+
+                  <Button className={classNames('mt-3')} color="primary" type="submit">
+                    Login
+                  </Button>
+                </fieldset>
+              </Form>
+            </Col>
+          </Row>
+        </Container>
+      </Layout>
     </div>
   );
 }

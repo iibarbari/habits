@@ -5,19 +5,17 @@ import {
   Button, Col, Container, Form, FormGroup, Input, Label, Row,
 } from 'reactstrap';
 import { RouterContext, UserContext } from '../../contexts';
-
-type TSignUp = {
-  email: string,
-  password: string,
-  passwordConfirm: string,
-}
+import { ArrowLeft } from '../../icons';
+import Icon from '../Icon';
+import Layout from '../Layout';
 
 export default function SignUpPage() {
   const { setPage } = useContext(RouterContext);
   const [formData, setFormData] = useState<TSignUp>({
+    name: '',
     email: '',
     password: '',
-    passwordConfirm: '',
+    confirmPassword: '',
   });
   const { signUp } = useContext(UserContext);
   const [error, setError] = useState<string | null>(null);
@@ -34,11 +32,15 @@ export default function SignUpPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (formData.password !== formData.passwordConfirm) {
+    if (formData.password !== formData.confirmPassword) {
       return;
     }
 
-    const response = await signUp({ email: formData.email, password: formData.password });
+    const response = await signUp({
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+    });
 
     if (typeof response === 'string') {
       setError(response);
@@ -61,64 +63,85 @@ export default function SignUpPage() {
         <meta content="#ffffff" name="theme-color" />
       </Head>
 
-      <Container className={classNames('mt-5', 'mb-5')}>
-        <Row>
-          <Col lg={{ offset: 3, size: 6 }} sm={{ offset: 2, size: 8 }}>
-            <Form className={classNames('w-100')} onSubmit={handleSubmit}>
-              <fieldset>
-                <h1 className={classNames('mb-5')}>Sign Up</h1>
+      <Layout verticallyCenter>
+        <Container className={classNames('mt-5', 'mb-5')}>
+          <Row>
+            <Col lg={{ offset: 3, size: 6 }} sm={{ offset: 2, size: 8 }}>
+              <Form className={classNames('w-100')} onSubmit={handleSubmit}>
+                <fieldset>
+                  <div className={classNames('d-flex', 'flex-row', 'align-items-center', 'gap-5', 'mb-5')}>
+                    <Button className={classNames('p-0')} onClick={() => setPage('landing')}>
+                      <Icon height={32} icon={<ArrowLeft />} width={32} />
+                    </Button>
 
-                <FormGroup>
-                  <Label for="email">Email</Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    onChange={handleChange}
-                    placeholder="Email"
-                    required
-                    type="email"
-                    value={formData.email}
-                  />
-                </FormGroup>
+                    <h1 className={classNames('m-0')}>Sign Up</h1>
+                  </div>
 
-                <FormGroup>
-                  <Label for="password">Password</Label>
-                  <Input
-                    id="password"
-                    minLength={6}
-                    name="password"
-                    onChange={handleChange}
-                    placeholder="Password"
-                    required
-                    type="password"
-                    value={formData.password}
-                  />
-                </FormGroup>
+                  <FormGroup>
+                    <Label for="name">Name</Label>
+                    <Input
+                      id="name"
+                      name="name"
+                      onChange={handleChange}
+                      placeholder="Name"
+                      required
+                      type="text"
+                      value={formData.name}
+                    />
+                  </FormGroup>
 
-                <FormGroup>
-                  <Label for="passwordConfirm">Password Confirmation</Label>
-                  <Input
-                    id="passwordConfirm"
-                    minLength={6}
-                    name="passwordConfirm"
-                    onChange={handleChange}
-                    placeholder="Password Confirmation"
-                    required
-                    type="password"
-                    value={formData.passwordConfirm}
-                  />
-                </FormGroup>
+                  <FormGroup>
+                    <Label for="email">Email</Label>
+                    <Input
+                      id="email"
+                      name="email"
+                      onChange={handleChange}
+                      placeholder="Email"
+                      required
+                      type="email"
+                      value={formData.email}
+                    />
+                  </FormGroup>
 
-                {error && <p className={classNames('text-danger')}>{error}</p>}
+                  <FormGroup>
+                    <Label for="password">Password</Label>
+                    <Input
+                      id="password"
+                      minLength={6}
+                      name="password"
+                      onChange={handleChange}
+                      placeholder="Password"
+                      required
+                      type="password"
+                      value={formData.password}
+                    />
+                  </FormGroup>
 
-                <Button className={classNames('mt-3')} color="primary" type="submit">
-                  Sign Up
-                </Button>
-              </fieldset>
-            </Form>
-          </Col>
-        </Row>
-      </Container>
+                  <FormGroup>
+                    <Label for="confirmPassword">Password Confirmation</Label>
+                    <Input
+                      id="confirmPassword"
+                      minLength={6}
+                      name="confirmPassword"
+                      onChange={handleChange}
+                      placeholder="Password Confirmation"
+                      required
+                      type="password"
+                      value={formData.confirmPassword}
+                    />
+                  </FormGroup>
+
+                  {error && <p className={classNames('text-danger')}>{error}</p>}
+
+                  <Button className={classNames('mt-3')} color="primary" type="submit">
+                    Sign Up
+                  </Button>
+                </fieldset>
+              </Form>
+            </Col>
+          </Row>
+        </Container>
+      </Layout>
     </div>
   );
 }

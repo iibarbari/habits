@@ -8,31 +8,33 @@ import AddNewHabit from '../AddNewHabit';
 export default function Header() {
   const { user, isLoading, signOut } = useContext(UserContext);
 
-  return (
-    <Container className={classNames('mt-5', 'mb-5', 'd-flex', 'justify-content-between')}>
-      <h1>HEY 👋🏻</h1>
+  return user === null
+    ? (
+      <>
+        <Link href="/login" passHref>
+          <Button disabled={isLoading}>
+            Login
+          </Button>
+        </Link>
 
-      <AddNewHabit />
+        <Link href="/sign-up" passHref>
+          <Button disabled={isLoading}>
+            Sign Up
+          </Button>
+        </Link>
+      </>
+    )
+    : (
+      <Container className={classNames('mt-5', 'mb-5', 'd-flex', 'justify-content-between')}>
+        <h1>
+          {`HEY ${user.name} 👋🏻`}
+        </h1>
 
-      {user === null ? (
-        <>
-          <Link href="/login" passHref>
-            <Button disabled={isLoading}>
-              Login
-            </Button>
-          </Link>
+        <AddNewHabit />
 
-          <Link href="/sign-up" passHref>
-            <Button disabled={isLoading}>
-              Sign Up
-            </Button>
-          </Link>
-        </>
-      ) : (
         <Button disabled={isLoading} onClick={() => signOut()}>
           Sign Out
         </Button>
-      )}
-    </Container>
-  );
+      </Container>
+    );
 }
