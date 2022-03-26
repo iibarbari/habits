@@ -25,16 +25,18 @@ export default function Header() {
       </>
     )
     : (
-      <Container className={classNames('mt-5', 'mb-5', 'd-flex', 'justify-content-between')}>
+      <Container className={classNames('mt-5', 'mb-5', 'd-flex', 'justify-content-between', 'flex-wrap', 'gap-5')}>
         <h1>
           {`HEY ${user.name} 👋🏻`}
         </h1>
 
-        <AddNewHabit />
+        <div className={classNames('d-flex', 'flex-row', 'gap-2', 'flex-wrap')}>
+          <AddNewHabit />
 
-        <Button disabled={isLoading} onClick={() => signOut()}>
-          Sign Out
-        </Button>
+          <Button disabled={isLoading} onClick={() => signOut()} outline>
+            Sign Out
+          </Button>
+        </div>
       </Container>
     );
 }

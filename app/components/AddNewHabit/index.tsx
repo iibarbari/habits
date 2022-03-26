@@ -1,5 +1,6 @@
+import classNames from 'classnames';
 import React, {
-  useCallback, useContext, useEffect, useState,
+  useCallback, useContext, useState,
 } from 'react';
 import {
   Button,
@@ -21,7 +22,7 @@ export default function AddNewHabit() {
   const { addHabit } = useContext(HabitContext);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [habit, setHabit] = useState<Omit<THabit, 'id'>>({
+  const [habit, setHabit] = useState<THabit>({
     title: '',
     days: [],
   });
@@ -32,6 +33,14 @@ export default function AddNewHabit() {
     const response = await addHabit(habit);
 
     setError(response);
+
+    if (response === null) {
+      setIsOpen(false);
+      setHabit({
+        title: '',
+        days: [],
+      });
+    }
   }, [addHabit, habit]);
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,13 +49,6 @@ export default function AddNewHabit() {
       [e.target.name]: e.target.value,
     });
   }, [habit]);
-
-  useEffect(() => {
-    setHabit({
-      title: '',
-      days: [],
-    });
-  }, [isOpen]);
 
   return (
     <>
@@ -88,8 +90,10 @@ export default function AddNewHabit() {
         </ModalFooter>
       </Modal>
 
-      <Button color="primary" onClick={() => setIsOpen(true)} outline size="sm">
+      <Button className={classNames('d-flex', 'align-items-center')} color="primary" onClick={() => setIsOpen(true)} outline size="sm">
         <Icon height={24} icon={<Plus />} width={24} />
+
+        Add new habit
       </Button>
     </>
   );
