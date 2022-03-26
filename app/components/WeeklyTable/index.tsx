@@ -1,32 +1,24 @@
 import dayjs from 'dayjs';
-import { doc, setDoc } from 'firebase/firestore';
-import { omit } from 'lodash';
 import range from 'lodash/range';
 import React, { useCallback, useContext } from 'react';
 import { FormGroup, Input, Table } from 'reactstrap';
 import { HabitContext } from '../../contexts';
-import firestore from '../../firebase/clientApp';
+import WeeklyTableRowTitle from '../WeeklyTableRowTitle';
 
 export default function WeeklyTable() {
   const {
     habits,
+    updateHabitByTitle,
     loading,
   } = useContext(HabitContext);
 
   const handleChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>, date: number, habit: THabit) => {
-      await setDoc(doc(firestore, 'habits', habit.id), {
-        ...omit(habit, 'id'),
-        updatedAt: dayjs().format('YYYY-MM-DD'),
-        days: e.target.checked ? {
-          ...habit.days,
-          [dayjs().day(date).format('YYYY-MM-DD')]: {
-            timestamp: new Date().getTime(),
-          },
-        } : omit(habit.days, dayjs().day(date).format('YYYY-MM-DD')),
-      });
+      e.preventDefault();
+
+      await updateHabitByTitle(habit, date);
     },
-    [],
+    [updateHabitByTitle],
   );
 
   return loading ? <p>Loading...</p> : (
@@ -52,8 +44,8 @@ export default function WeeklyTable() {
 
       <tbody>
         {habits.map((habit) => (
-          <tr key={habit.id}>
-            <th scope="row">{habit.title}</th>
+          <tr key={habit.title}>
+            <WeeklyTableRowTitle habit={habit} />
 
             {range(0, 7).map((date: number) => (
               <td key={date}>
@@ -61,9 +53,11 @@ export default function WeeklyTable() {
                   <Input
                     checked={
                       habit.days !== undefined
-                      && Object.keys(habit.days).includes(dayjs().day(date).format('YYYY-MM-DD'))
+                      && habit.days.find((d) => dayjs(d).isSame(dayjs().day(date), 'day')) !== undefined
                     }
-                    onChange={(e) => handleChange(e, date, habit)}
+                    onChange={(e) => {
+                      handleChange(e, new Date(dayjs().day(date).toDate()).getTime(), habit);
+                    }}
                     type="checkbox"
                   />
                 </FormGroup>

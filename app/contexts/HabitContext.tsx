@@ -1,21 +1,27 @@
-import { FirebaseError } from '@firebase/util';
-import {
-  arrayUnion, doc, getDoc, updateDoc,
-} from 'firebase/firestore';
 import React, {
   createContext, useCallback, useContext, useEffect, useMemo, useState,
 } from 'react';
-import firestore from '../firebase/clientApp';
+import {
+  addNewHabit, getAllUserHabits, removeHabit, updateHabit,
+} from '../helpers';
 import { UserContext } from './UserContext';
 
 const initialValue = {
   habits: [],
   loading: true,
   addHabit: async () => 'Not implemented',
+  updateHabitByTitle: async () => 'Not implemented',
+  removeHabitByTitle: async () => 'Not implemented',
 };
 
 export const HabitContext = createContext<{
-  addHabit:(_: Omit<THabit, 'id'>) => Promise<string | null>,
+  addHabit:(_: THabit) => Promise<string | null>,
+  updateHabitByTitle: (
+    _habit: THabit,
+    _newDate?: number,
+    _newTitle?: string
+  ) => Promise<string | void>,
+  removeHabitByTitle: (_habit: THabit) => Promise<string | null>,
   habits: THabit[],
   loading: boolean
     }>(initialValue);
@@ -32,59 +38,67 @@ export default function HabitProvider({ children }: { children: React.ReactNode 
       return 'Not logged in';
     }
 
-    try {
-      setLoading(true);
+    setLoading(true);
 
-      const docRef = doc(firestore, `users/${user.uid}`);
-      const mySnapshot = await getDoc(docRef);
+    const habitsResponse = await getAllUserHabits(user.uid);
 
-      if (mySnapshot.exists()) {
-        const docData = mySnapshot.data();
+    setHabits(typeof habitsResponse === 'string' ? [] : habitsResponse);
 
-        if (docData && docData.habits) {
-          setHabits(docData.habits);
-        }
-      }
+    setLoading(false);
 
-      return null;
-    } catch (err: unknown) {
-      if (err instanceof FirebaseError) {
-        return err.message;
-      }
-
-      return 'Something went wrong';
-    } finally {
-      setLoading(false);
-    }
+    return habitsResponse;
   }, [user]);
+
+  const updateHabitByTitle = useCallback(async (
+    habit: THabit,
+    newDate?: number,
+    newTitle?: string,
+  ) => {
+    if (user === null) return;
+
+    setLoading(true);
+
+    await updateHabit(user.uid, habit, newDate, newTitle);
+
+    setLoading(false);
+
+    await getHabits();
+  }, [getHabits, user]);
 
   useEffect(() => {
     getHabits();
-  }, [getHabits]);
+  }, [getHabits, user]);
 
   const addHabit = useCallback(
-    async (habit: Omit<THabit, 'id'>) => {
+    async (habit: THabit) => {
       if (user === null) return 'Not logged in';
 
-      try {
-        setLoading(true);
+      setLoading(true);
 
-        const docRef = doc(firestore, `users/${user.uid}`);
+      await addNewHabit(user.uid, habit);
 
-        await updateDoc(docRef, {
-          habits: arrayUnion(habit),
-        });
+      setLoading(false);
 
-        return await getHabits();
-      } catch (err: unknown) {
-        if (err instanceof FirebaseError) {
-          return err.message;
-        }
+      await getHabits();
 
-        return 'Something went wrong';
-      } finally {
-        setLoading(false);
-      }
+      return null;
+    },
+    [getHabits, user],
+  );
+
+  const removeHabitByTitle = useCallback(
+    async (habit: THabit) => {
+      if (user === null) return 'Not logged in';
+
+      setLoading(true);
+
+      await removeHabit(user.uid, habit);
+
+      setLoading(false);
+
+      await getHabits();
+
+      return null;
     },
     [getHabits, user],
   );
@@ -93,7 +107,9 @@ export default function HabitProvider({ children }: { children: React.ReactNode 
     habits,
     addHabit,
     loading,
-  }), [addHabit, habits, loading]);
+    removeHabitByTitle,
+    updateHabitByTitle,
+  }), [addHabit, habits, updateHabitByTitle, removeHabitByTitle, loading]);
 
   return (
     <HabitContext.Provider value={value}>
