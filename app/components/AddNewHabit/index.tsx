@@ -1,5 +1,6 @@
-import { addDoc, collection } from '@firebase/firestore';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {
+  useCallback, useContext, useEffect, useState,
+} from 'react';
 import {
   Button,
   Form,
@@ -12,43 +13,26 @@ import {
   ModalFooter,
   ModalHeader,
 } from 'reactstrap';
-import firestore from '../../firebase/clientApp';
+import { HabitContext } from '../../contexts';
 import { Plus } from '../../icons';
 import Icon from '../Icon';
 
-type TForm = {
-  title: string
-}
-
 export default function AddNewHabit() {
+  const { addHabit } = useContext(HabitContext);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [habit, setHabit] = useState<TForm>({
+  const [habit, setHabit] = useState<Omit<THabit, 'id'>>({
     title: '',
+    days: [],
   });
 
-  const saveNewHabit = useCallback(async () => {
-    const collectionRef = collection(firestore, 'habits');
-
-    try {
-      await addDoc(collectionRef, {
-        title: habit.title,
-        createdAt: new Date().getTime(),
-        updatedAt: new Date().getTime(),
-        days: {},
-      });
-
-      setIsOpen(false);
-    } catch (_) {
-      setError('Cannot save');
-    }
-  }, [habit.title]);
-
-  const handleSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    saveNewHabit();
-  }, [saveNewHabit]);
+    const response = await addHabit(habit);
+
+    setError(response);
+  }, [addHabit, habit]);
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setHabit({
@@ -60,6 +44,7 @@ export default function AddNewHabit() {
   useEffect(() => {
     setHabit({
       title: '',
+      days: [],
     });
   }, [isOpen]);
 
